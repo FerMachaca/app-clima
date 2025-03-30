@@ -4,7 +4,7 @@ import { AsyncPaginate } from "react-select-async-paginate";
 import axios from "axios";
 import { GEO_API_URL, geoApiOptions } from "@/hooks/useCity";
 // Definir estos tipos en un archivo types.ts
-import { FormProps, CityOption, City } from "@/types"; // Importar los tipos
+import { FormProps, CityOption, City } from "@/constants/types"; // Importar los tipos
 import { useState } from "react";
 
 const Form: React.FC<FormProps> = ({ onSearchChange }) => {
