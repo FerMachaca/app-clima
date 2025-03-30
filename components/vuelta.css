@@ -1,0 +1,47 @@
+/**
+ * vuelta.css
+ *
+ * @format
+ */
+
+.forecast-card {
+  perspective: 1000px;
+}
+
+.forecast-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s;
+  transform-style: preserve-3d;
+}
+
+.forecast-card:hover .forecast-card-inner {
+  transform: rotateY(180deg);
+}
+
+.forecast-card-front,
+.forecast-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+}
+
+.forecast-card-back {
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .forecast-card-inner {
+    font-size: 0.8rem; /* Ajusta el tamaño del texto en pantallas pequeñas */
+  }
+  .forecast-card-back {
+    font-size: 0.7rem; /* Ajusta el tamaño del texto en pantallas pequeñas */
+  }
+}

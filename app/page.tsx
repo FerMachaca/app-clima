@@ -1,101 +1,90 @@
-import Image from "next/image";
+/** @format */
+"use client";
+import { useEffect, useState, useCallback } from "react";
+import useWeather from "@/hooks/useWeather";
+import WeatherDetail from "@/components/WeatherDetail";
+import Spinner from "@/components/Spinner";
+import Alert from "@/components/Alert";
+import Forecast from "@/components/Forecast";
+import Navbar from "@/components/Navbar";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const { weather, loading, notFound, fetchWeather, hasWeatherData, forecast } =
+    useWeather();
+  const [bgUrl, setBgUrl] = useState("/assets/bg_clouds.webp");
+  const [locationFetched, setLocationFetched] = useState(false); // Nuevo estado
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const handleOnSearchChange = useCallback(
+    (searchData: { latitude: string; longitude: string }) => {
+      if (!searchData) {
+        console.error("searchData es undefined");
+        return;
+      }
+
+      const { latitude, longitude } = searchData;
+      if (latitude && longitude) {
+        fetchWeather(latitude, longitude);
+      } else {
+        console.error("El valor de searchData no tiene el formato esperado");
+      }
+    },
+    [fetchWeather]
+  );
+
+  useEffect(() => {
+    // Establecer Lima como ubicación inicial solo una vez
+    if (!locationFetched) {
+      fetchWeather("-12.04318", "-77.02824");
+      setLocationFetched(true); // Marcar como ubicación ya obtenida
+    }
+  }, [fetchWeather, locationFetched]);
+
+  useEffect(() => {
+    if (hasWeatherData) {
+      let weatherCondition = weather.weather[0].main.toLowerCase();
+      const atmosphereConditions = [
+        "mist",
+        "smoke",
+        "haze",
+        "dust",
+        "fog",
+        "sand",
+        "ash",
+        "squall",
+        "tornado",
+      ];
+
+      if (atmosphereConditions.includes(weatherCondition)) {
+        weatherCondition = "atmosphere";
+      }
+      setBgUrl(`/assets/bg_${weatherCondition}.webp`);
+    }
+  }, [weather, hasWeatherData]);
+
+  console.log(bgUrl);
+  return (
+    <main
+      className="relative h-full min-h-screen bg-no-repeat bg-cover bg-center transition-all duration-1000"
+      style={{ backgroundImage: `url('${bgUrl}')` }}
+    >
+      {/* Navbar */}
+      <Navbar onSearchChange={handleOnSearchChange} />
+
+      <div className="absolute inset-0 bg-black opacity-20"></div>
+      <div className="container mx-auto pb-5">
+        <div>
+          {loading && (
+            <div className="text-white text-2xl">
+              <Spinner />
+            </div>
+          )}
+          {hasWeatherData && <WeatherDetail weather={weather} />}
+          <div className="relative">
+            {hasWeatherData && <Forecast forecast={forecast} />}
+            {notFound && <Alert>Ciudad No encontrada</Alert>}
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div>
+    </main>
   );
 }

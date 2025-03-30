@@ -1,3 +1,5 @@
+/** @format */
+
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -12,6 +14,10 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      animation: {
+        "sk-cube-grid": "sk-cubeGridScaleDelay 1.3s infinite ease-in-out",
+      },
+      keyframes: {},
     },
   },
   plugins: [],
